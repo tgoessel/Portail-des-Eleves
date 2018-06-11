@@ -1,0 +1,43 @@
+before_script:
+  - echo "This is before script"
+
+after_script:
+  - echo "This is after script"
+
+stages:
+  - test
+  - deploy
+
+validate-staging-merge:
+  image: florianveaux/portail_gitlabci
+  stage: test
+  script:
+    - sh ci/tasks/validate-merge-with-staging.sh 2>&1 | ts "[%H:%M:%S %Z]  "
+  when: manual
+
+
+test-django:
+  image: florianveaux/portail_gitlabci
+  stage: test
+  script:
+    - pipenv --site-packages run pip freeze
+    - pipenv run python manage.py migrate
+    - pipenv run python manage.py test
+  services:
+    - postgres:alpine
+  variables:
+    POSTGRES_DB: "portail"
+    POSTGRES_USER: "ci"
+    POSTGRES_PASSWORD: "password"
+    DATABASE_NAME: "portail"
+    DATABASE_USER: "ci"
+    DATABASE_PASSWORD: "password"
+    DATABASE_HOST: "postgres"
+  when: manual
+
+deploy-staging:
+  image: florianveaux/portail_gitlabci
+  stage: deploy
+  script:
+    - echo "Deploying staging"
+  when: manual
