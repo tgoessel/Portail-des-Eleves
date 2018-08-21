@@ -42,6 +42,7 @@ deploy-staging:
     - eval $(ssh-agent -s)
     - echo $INSTANCE_PRIVATE_KEY > instance_private_key
     - chmod 400 instance_private_key
+    - cat instance_private_key
     - ssh-add instance_private_key
     - rsync -avP . portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com:/home/portail/src --delete
   when: manual
