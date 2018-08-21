@@ -43,5 +43,5 @@ deploy-staging:
     - echo "$INSTANCE_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    - rsync -avP -e "ssh -o StrictHostKeyChecking=no" . portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com:/home/portail/src --delete
+    - rsync -aP -e "ssh -o StrictHostKeyChecking=no" . portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com:/home/portail/src --delete
   when: manual
