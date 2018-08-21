@@ -39,5 +39,7 @@ deploy-staging:
   image: florianveaux/portail_gitlabci
   stage: deploy
   script:
-    - echo "Deploying staging"
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$INSTANCE_PRIVATE_KEY")
+    - rsync -avP . portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com:/home/portail/src --delete
   when: manual
