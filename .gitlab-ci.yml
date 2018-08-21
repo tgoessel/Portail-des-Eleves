@@ -40,6 +40,7 @@ deploy-staging:
   stage: deploy
   script:
     - eval $(ssh-agent -s)
-    - ssh-add <(echo "$INSTANCE_PRIVATE_KEY")
+    - echo $INSTANCE_PRIVATE_KEY > instance_private_key
+    - ssh-add instance_private_key
     - rsync -avP . portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com:/home/portail/src --delete
   when: manual
