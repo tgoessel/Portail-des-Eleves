@@ -40,6 +40,7 @@ deploy-staging:
   stage: deploy
   script:
     - eval $(ssh-agent -s)
+    - echo $INSTANCE_PRIVATE_KEY
     - echo $INSTANCE_PRIVATE_KEY > instance_private_key
     - chmod 400 instance_private_key
     - cat instance_private_key
