@@ -1,70 +1,90 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
-import { isDevMode } from '@angular/core';
 
 const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
 
 const server = "http://localhost:8000/api/v1/";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ApiService {
 
-  header: any;
+    header: any;
 
-  constructor(private http: HttpClient,
-              private cookieService: CookieService) { }
-
-  checkAuthentication() {
-    if (localStorage.getItem("csrf_token") != null) {
-      this.header = new HttpHeaders({ 'x-csrf-token': localStorage.getItem("csrf_token") })
-      return true
-    } else {
-      return false
+    constructor(private http: HttpClient, private cookieService: CookieService) {
+        this.header = new HttpHeaders().set('X-REQUESTED-WITH', 'XMLHttpRequest');
     }
-  }
 
-  authenticate(login: string, password: string) {
-    return this.http.post(
-      server + "auth/",
-      {"username": login, "password": password},
-      {withCredentials: !isDevMode()})
-  }
+    get<T>(url: String){
+        return this.http.get<T>(
+            server + url,
+            {
+                headers: this.header,
+                withCredentials: true
+            }
+        )
+    }
 
-  getFiles(storageKey: string) {
-    return this.http.post(
-      "/api/v1/files",
-      { "StorageKey": storageKey },
-      { headers: this.header })
-  }
+    post<T>(url: String, body: any){
+        return this.http.post<T>(
+            server + url,
+            body,
+            {
+                headers: this.header,
+                withCredentials: true
+            }
+        )
+    }
 
-  postFiles(filename: string, dowloadsLeft: number, expiresIn: number, rawData: string) {
-    return this.http.post(
-      "/api/v1/files/new",
-      {
-        "Filename": filename,
-        "DownloadsLeft": dowloadsLeft,
-        "ExpiresIn": expiresIn,
-        "RawData": rawData
-      },
-      { headers: this.header})
-  }
+    put<T>(url: String, body: any){
+        return this.http.put<T>(
+            server + url,
+            body,
+            {
+                headers: this.header,
+                withCredentials: true
+            }
+        )
+    }
 
-  downloadFile(storageKey: string) {
-    return this.http.post(
-      "/api/v1/files/download",
-      { "StorageKey": storageKey },
-      { headers: this.header })
-  }
+    delete<T>(url: String){
+        return this.http.delete<T>(
+            server + url,
+            {
+                headers: this.header,
+                withCredentials: true
+            }
+        )
+    }
 
-  deleteFile(storageKey: string) {
-    return this.http.post(
-      "/api/v1/files/delete",
-      { "StorageKey": storageKey },
-      { headers: this.header })
-  }
+    checkAuthentication() {
+        return this.http.post(
+            server + "auth/check/",
+            null,
+            {
+                headers: this.header,
+                withCredentials: true
+            }
+        );
+    }
+
+    authenticate(login: string, password: string) {
+        return this.http.post(
+            server + "auth/",
+            {"pseudo": login, "password": password},
+            {withCredentials: true}
+        );
+    }
+
+    logout(){
+        // Why simply deleting the cookie does not work ?
+        // If you have an idea, please write me on Slack
+        this.cookieService.set("jwt_access_token", "");
+    }
+
+    getUser() {
+        return this.http.get(server + "auth/current_user/", {withCredentials: true})
+    }
 }
