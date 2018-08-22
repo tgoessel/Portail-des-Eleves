@@ -12,7 +12,7 @@ validate-staging-merge:
   image: florianveaux/portail_gitlabci
   stage: test
   script:
-    - sh ci/tasks/validate-merge-with-staging.sh 2>&1 | ts "[%H:%M:%S %Z]  "
+    - sh ci/scripts/validate-merge-with-staging.sh 2>&1 | ts "[%H:%M:%S %Z]  "
   when: manual
 
 
@@ -44,4 +44,5 @@ deploy-staging:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - rsync -aP -e "ssh -o StrictHostKeyChecking=no" . portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com:/home/portail/src --delete
+    - ssh -o StrictHostKeyChecking=no portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com "./src/ci/scripts/deploy.sh"
   when: manual
