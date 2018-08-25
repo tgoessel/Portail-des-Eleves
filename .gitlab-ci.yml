@@ -57,7 +57,7 @@ deploy-angular-staging:
     - chmod 700 ~/.ssh
     - cd frontend/
     - npm install
-    - ./node_modules/@angular/cli/bin/ng build
+    - ./node_modules/@angular/cli/bin/ng build --configuration=staging
     - mv dist/portail/ /tmp/angular-frontend-portail
     - cd ..
     - rm -Rf frontend
