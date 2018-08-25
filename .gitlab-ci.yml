@@ -35,7 +35,7 @@ test-django:
     DATABASE_HOST: "postgres"
   when: manual
 
-deploy-staging:
+deploy-django-staging:
   image: florianveaux/portail_gitlabci
   stage: deploy
   script:
@@ -44,5 +44,23 @@ deploy-staging:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - rsync -avP -e "ssh -o StrictHostKeyChecking=no" . portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com:/home/portail/src --delete
+    - ssh -o StrictHostKeyChecking=no portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com "./src/ci/scripts/deploy.sh"
+  when: manual
+
+deploy-angular-staging:
+  image: florianveaux/portail_gitlabci
+  stage: deploy
+  script:
+    - eval $(ssh-agent -s)
+    - echo "$INSTANCE_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - cd frontend/
+    - npm install
+    - ./node_modules/@angular/cli/bin/ng build
+    - mv dist/portail/ /tmp/angular-frontend-portail
+    - cd ..
+    - rm -Rf frontend
+    - rsync -avP -e "ssh -o StrictHostKeyChecking=no" /tmp/angular-frontend-portail portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com:/home/portail/angular/dist --delete
     - ssh -o StrictHostKeyChecking=no portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com "./src/ci/scripts/deploy.sh"
   when: manual
