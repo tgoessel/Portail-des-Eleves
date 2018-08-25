@@ -1,9 +1,3 @@
-before_script:
-  - echo "This is before script"
-
-after_script:
-  - echo "This is after script"
-
 stages:
   - test
   - deploy
@@ -46,6 +40,8 @@ deploy-django-staging:
     - rsync -avP -e "ssh -o StrictHostKeyChecking=no" . portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com:/home/portail/src --delete
     - ssh -o StrictHostKeyChecking=no portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com "./src/ci/scripts/deploy.sh"
   when: manual
+  only:
+    - staging
 
 deploy-angular-staging:
   image: florianveaux/portail_gitlabci
@@ -64,3 +60,5 @@ deploy-angular-staging:
     - rsync -avP -e "ssh -o StrictHostKeyChecking=no" /tmp/angular-frontend-portail/ portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com:/home/portail/angular/dist/ --delete
     - ssh -o StrictHostKeyChecking=no portail@ec2-35-180-128-185.eu-west-3.compute.amazonaws.com "./src/ci/scripts/deploy.sh"
   when: manual
+  only:
+    - staging
